@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="ss-grad" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#25D366" />
+      <stop offset="55%" stop-color="#12B886" />
+      <stop offset="100%" stop-color="#0EA5E9" />
+    </linearGradient>
+    <linearGradient id="ss-peel" x1="82" y1="82" x2="114" y2="114" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B4F38" />
+      <stop offset="100%" stop-color="#072E22" />
+    </linearGradient>
+  </defs>
+  <!-- Main rounded sticker shape with bottom-right peeled corner -->
+  <path
+    d="M32 14h64c9.941 0 18 8.059 18 18v48.5c0 4.5-1.787 8.816-4.97 11.999L92.5 109.03C89.316 112.213 85 114 80.5 114H32c-9.941 0-18-8.059-18-18V32c0-9.941 8.059-18 18-18Z"
+    fill="url(#ss-grad)"
+  />
+  <!-- Subtle inner border -->
+  <path
+    d="M32 17h64c8.284 0 15 6.716 15 15v48c0 3.7-1.45 7.25-4.05 9.9L90.4 106.45C87.75 109.05 84.2 110.5 80.5 110.5H32c-8.284 0-15-6.716-15-15V32c0-8.284 6.716-15 15-15Z"
+    stroke="rgba(255,255,255,0.28)"
+    stroke-width="2"
+  />
+  <!-- Sound waveform bars inside sticker -->
+  <rect x="33" y="54" width="8" height="20" rx="4" fill="#062116" />
+  <rect x="46" y="40" width="8" height="48" rx="4" fill="#062116" />
+  <rect x="59" y="32" width="8" height="64" rx="4" fill="#062116" />
+  <rect x="72" y="44" width="8" height="40" rx="4" fill="#062116" />
+  <rect x="85" y="52" width="8" height="24" rx="4" fill="#062116" />
+  <!-- Sticker peel fold -->
+  <path
+    d="M114 80c0 4.5-1.787 8.816-4.97 11.999L92.5 109.03C89.316 112.213 85 114 80.5 114c4.5-4.5 5.5-10.5 5.5-17v-5c0-6.627 5.373-12 12-12h5c6.5 0 11-1 11 0Z"
+    fill="url(#ss-peel)"
+  />
+  <path
+    d="M84 113c3.5-4 4.5-9.5 4.5-15v-4c0-5.523 4.477-10 10-10h4c5.5 0 9.5-1 11-3.5"
+    stroke="rgba(255,255,255,0.35)"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+</svg>

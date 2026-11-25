@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sticker Sound — Stickers con Audio para WhatsApp</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img class="brand-logo" src="/logo.svg" alt="Sticker Sound">
+        <div>
+          <strong>Sticker Sound</strong>
+          <small>Stickers con audio para WhatsApp · editor + envío directo</small>
+        </div>
+      </div>
+
+      <div class="wa-bar">
+        <div class="status-pill" id="statusPill">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Desconectado</span>
+        </div>
+        <button type="button" class="btn ghost sm" id="toggleConnBtn">Vincular WhatsApp</button>
+        <button type="button" class="btn danger sm" id="logoutBtn" hidden>Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Connection Card (Collapsible) -->
+    <section class="card conn-card" id="connPanel" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Vincular cuenta de WhatsApp</h2>
+          <p class="muted">Sesión local en <code>auth/</code>. Elige código numérico o escaneo QR.</p>
+        </div>
+        <button type="button" class="btn ghost sm" id="closeConnBtn">Ocultar</button>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-conn-tab="code">Código con teléfono</button>
+        <button type="button" class="tab" data-conn-tab="qr">Código QR</button>
+      </div>
+
+      <div id="connTabCode" class="tab-body">
+        <div class="row">
+          <div class="grow">
+            <label class="lbl" for="pairPhone">Tu número (DDI + área + número, solo dígitos)</label>
+            <input id="pairPhone" type="text" inputmode="numeric" placeholder="Ej: 5491122334455">
+          </div>
+          <button type="button" class="btn primary" id="pairCodeBtn">Generar código</button>
+        </div>
+        <div id="pairCodeBox" class="code-box" hidden></div>
+        <p class="hint" id="pairCodeHint" hidden>
+          En tu teléfono: <b>WhatsApp → Dispositivos vinculados → Vincular un dispositivo → Vincular con número de teléfono</b> e ingresa el código.
+        </p>
+      </div>
+
+      <div id="connTabQr" class="tab-body" hidden>
+        <div class="qr-wrap">
+          <button type="button" class="btn primary" id="genQrBtn">Generar / Actualizar QR</button>
+          <div id="qrBox" class="qr-box" hidden>
+            <img id="qrImg" alt="Código QR de WhatsApp">
+          </div>
+          <p class="hint">Escanea desde <b>WhatsApp → Dispositivos vinculados → Vincular un dispositivo</b>.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <!-- Left: Visual Editor + Audio Trimmer -->
+      <section class="card editor-card">
+        <div class="card-head">
+          <div>
+            <h2>1. Editor Visual</h2>
+            <p class="muted">Pega (<code>Ctrl+V</code>), arrastra o selecciona PNG, GIF, WebP, JPG o Video.</p>
+          </div>
+          <button type="button" class="btn ghost sm" id="resetEditorBtn" title="Limpiar editor">✕ Limpiar</button>
+        </div>
+
+        <!-- Interactive 1:1 Stage -->
+        <div class="stage-wrap">
+          <div id="stage" class="stage checkerboard empty" tabindex="0" title="Haz clic para elegir archivo o pega con Ctrl+V">
+            <div id="stageEmpty" class="stage-empty">
+              <div class="plus">+</div>
+              <strong>Suelta o pega tu sticker / video</strong>
+              <span>PNG transparente · GIF animado · WebP · MP4</span>
+            </div>
+            <img id="stageImg" alt="Vista previa del sticker" hidden>
+            <video id="stageVideo" muted loop playsinline autoplay hidden></video>
+            <span id="stageBadge" class="stage-badge" hidden>1:1 · 512×512</span>
+            <span id="stageAudioBadge" class="stage-audio-badge" hidden>🔊</span>
+          </div>
+          <input id="mediaInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime,.mkv" hidden>
+        </div>
+
+        <!-- Framing, Matte & FPS Controls -->
+        <div class="controls-grid">
+          <div>
+            <label class="lbl" for="fitSelect">Encuadre 1:1</label>
+            <select id="fitSelect">
+              <option value="cover" selected>Recortar (mueve el mouse encima)</option>
+              <option value="contain">Completa (sin recortar)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" for="fpsSelect">Fluidez (FPS)</label>
+            <select id="fpsSelect">
+              <option value="8">8 FPS (liviano)</option>
+              <option value="10">10 FPS</option>
+              <option value="12">12 FPS</option>
+              <option value="15" selected>15 FPS (recomendado)</option>
+              <option value="20">20 FPS</option>
+              <option value="24">24 FPS</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" for="stickerName">Nombre (opcional)</label>
+            <input id="stickerName" type="text" placeholder="mi-sticker">
+          </div>
+        </div>
+
+        <div class="matte-row">
+          <span class="lbl inline">Fondo:</span>
+          <button type="button" class="chip active" data-matte="transparent">Transparente</button>
+          <button type="button" class="chip" data-matte="#FFFFFF">Blanco</button>
+          <button type="button" class="chip" data-matte="#000000">Negro</button>
+          <label class="chip color-chip" title="Color personalizado">
+            <span>Color</span>
+            <input id="customMatte" type="color" value="#25D366">
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Audio & Waveform Trimmer -->
+        <div class="audio-section">
+          <div class="card-head compact">
+            <h2>2. Sonido (hasta 10 s)</h2>
+            <div class="pill-group" role="group" aria-label="Modo de sonido">
+              <button type="button" class="chip active" data-audio-mode="none">Sin sonido</button>
+              <button type="button" class="chip" data-audio-mode="file">Archivo / MyInstants</button>
+              <button type="button" class="chip" id="videoAudioBtn" data-audio-mode="video" disabled>Audio del video</button>
+            </div>
+          </div>
+
+          <div id="audioFileControls" hidden>
+            <div class="row">
+              <div class="grow">
+                <input id="myInstantsInput" type="url" placeholder="Pega un enlace de myinstants.com/instant/...">
+              </div>
+              <button type="button" class="btn ghost" id="fetchMyInstantsBtn">Importar</button>
+              <button type="button" class="btn ghost" id="pickAudioBtn">Subir audio</button>
+              <input id="audioInput" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.opus,.flac" hidden>
+            </div>
+
+            <div id="trimmerBox" class="trimmer-box" hidden>
+              <div class="trimmer-top">
+                <button type="button" class="play-btn" id="playAudioBtn" title="Escuchar recorte">▶</button>
+                <div class="audio-title" id="audioTitle">audio.mp3</div>
+                <select id="maxWinSelect" class="win-select" title="Duración máxima del recorte">
+                  <option value="5000" selected>Ventana máx: 5 s</option>
+                  <option value="10000">Ventana máx: 10 s</option>
+                </select>
+                <span class="time-pill" id="trimReadout">0.0s – 5.0s</span>
+              </div>
+
+              <div class="waveform-wrap" id="waveformWrap" title="Haz clic para mover la ventana de sonido">
+                <canvas id="waveformCanvas" width="520" height="56"></canvas>
+                <div id="trimWindow" class="trim-window"></div>
+              </div>
+
+              <input id="trimSlider" type="range" min="0" max="0" step="50" value="0" hidden>
+            </div>
+          </div>
+
+          <p id="videoAudioHint" class="hint" hidden>
+            Se usará automáticamente la pista de audio del video subido (recortada a los primeros 10 s como máximo).
+          </p>
+        </div>
+
+        <div class="create-bar">
+          <span id="createInfo" class="muted">Listo para convertir a 512×512 WebP (&lt; 500 KB) + OGG/Opus.</span>
+          <button type="button" class="btn primary lg" id="createBtn" disabled>Crear Sticker</button>
+        </div>
+      </section>
+
+      <!-- Right: Selected Sticker + Direct WhatsApp Send + Gallery -->
+      <section class="card gallery-card">
+        <div class="card-head">
+          <div>
+            <h2>3. Galería y Envío</h2>
+            <p class="muted">Selecciona un sticker para previsualizar, descargar o enviar directo.</p>
+          </div>
+          <span class="count-pill" id="galleryCount">0</span>
+        </div>
+
+        <div id="selectedBox" class="selected-box" hidden>
+          <div class="selected-preview">
+            <img id="selImg" class="checkerboard" alt="Sticker seleccionado">
+            <div class="selected-meta">
+              <strong id="selName">sticker.webp</strong>
+              <span id="selStats" class="muted"></span>
+              <audio id="selAudio" controls preload="none" hidden></audio>
+            </div>
+          </div>
+
+          <div class="row send-row">
+            <div class="grow">
+              <label class="lbl" for="targetPhone">Número destino (con DDI, ej: 54911...)</label>
+              <input id="targetPhone" type="text" inputmode="numeric" placeholder="5491122334455">
+            </div>
+            <button type="button" class="btn accent" id="sendWaBtn">Enviar por WhatsApp</button>
+          </div>
+
+          <div class="export-actions">
+            <a id="dlWebpBtn" class="btn ghost sm" download>⬇ Descargar .webp</a>
+            <a id="dlMp4Btn" class="btn ghost sm" download hidden>⬇ Descargar .mp4</a>
+            <button type="button" class="btn danger sm" id="delSelBtn">Eliminar</button>
+          </div>
+        </div>
+
+        <div id="galleryGrid" class="gallery-grid">
+          <div class="empty-gallery">Aún no has creado stickers. Crea el primero en el editor.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
